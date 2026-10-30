@@ -63,11 +63,12 @@ public class CreditCardValidationMiddleware(
             return false;
 
         var path = request.Path.Value ?? string.Empty;
-        // Matches /v1/balance/{accountId}/deposit and /v1/balance/{accountId}/withdraw
+        // Matches /v1/balance/{accountId}/deposit, /withdraw and /refund
         return path.StartsWith("/v1/balance/", StringComparison.OrdinalIgnoreCase)
             && (
                 path.EndsWith("/deposit", StringComparison.OrdinalIgnoreCase)
                 || path.EndsWith("/withdraw", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith("/refund", StringComparison.OrdinalIgnoreCase)
             );
     }
 

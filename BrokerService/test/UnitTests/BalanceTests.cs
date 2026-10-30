@@ -99,6 +99,31 @@ public class BalanceTests
     }
 
     [Fact]
+    public async Task Refund_WithValidInput_ShouldUpdateBalance()
+    {
+        // Arrange
+        const decimal startingValue = 75.25M;
+        const decimal amount = 20.10M;
+        const int id = 212;
+
+        Balance[] balances = { new Balance(id, startingValue) };
+        var balanceService = BuildFakeBalanceService(balances, Array.Empty<BalanceHistory>());
+
+        // Act
+        await balanceService.Refund(id, amount);
+        var balance = await balanceService.GetBalanceOfAccount(id);
+
+        // Assert
+        var balanceHistory = _balanceRepository!.GetBalanceHistories().First();
+
+        Assert.Equal(startingValue - amount, balance.Value);
+        Assert.Equal(id, balanceHistory.AccountId);
+        Assert.Equal(startingValue, balanceHistory.OldValue);
+        Assert.Equal(-amount, balanceHistory.ValueChange);
+        Assert.Equal(nameof(ActionType.CardRefund).ToLower(), balanceHistory.ActionType);
+    }
+
+    [Fact]
     public async Task Withdraw_NotEnoughMoney_ShouldThrowException()
     {
         // Arrange
@@ -116,7 +141,24 @@ public class BalanceTests
     }
 
     [Fact]
-    public async Task DepositWithdraw_WithInvalidAccount_ShouldThrowException()
+    public async Task Refund_NotEnoughMoney_ShouldThrowException()
+    {
+        // Arrange
+        const decimal startingValue = 5M;
+        const decimal amount = 6M;
+        const int id = 88;
+
+        Balance[] balances = { new Balance(id, startingValue) };
+        var balanceService = BuildFakeBalanceService(balances, Array.Empty<BalanceHistory>());
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotEnoughMoneyException>(
+            async () => await balanceService.Refund(id, amount)
+        );
+    }
+
+    [Fact]
+    public async Task DepositWithdrawRefund_WithInvalidAccount_ShouldThrowException()
     {
         // Arrange
         const decimal amount = 100;
@@ -134,10 +176,13 @@ public class BalanceTests
         await Assert.ThrowsAsync<AccountNotFoundException>(
             async () => await balanceService.Withdraw(id, amount)
         );
+        await Assert.ThrowsAsync<AccountNotFoundException>(
+            async () => await balanceService.Refund(id, amount)
+        );
     }
 
     [Fact]
-    public async Task DepositWithdraw_WithNegativeAmount_ShouldThrowException()
+    public async Task DepositWithdrawRefund_WithNegativeAmount_ShouldThrowException()
     {
         // Arrange
         const decimal startingValue = 0;
@@ -153,6 +198,9 @@ public class BalanceTests
         );
         await Assert.ThrowsAsync<NegativeAmountException>(
             async () => await balanceService.Withdraw(id, amount)
+        );
+        await Assert.ThrowsAsync<NegativeAmountException>(
+            async () => await balanceService.Refund(id, amount)
         );
     }
 

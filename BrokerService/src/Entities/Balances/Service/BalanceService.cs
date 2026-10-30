@@ -16,6 +16,9 @@ public class BalanceService(IBalanceRepository balanceRepository, ILogger<Balanc
     public Task<Balance> Withdraw(int accountId, decimal amount) =>
         ModifyBalance(accountId, amount, ActionType.Withdraw);
 
+    public Task<Balance> Refund(int accountId, decimal amount) =>
+        ModifyBalance(accountId, amount, ActionType.CardRefund);
+
     private async Task<Balance> ModifyBalance(int accountId, decimal amount, ActionType actionType)
     {
         _logger.LogInformation(
@@ -28,7 +31,9 @@ public class BalanceService(IBalanceRepository balanceRepository, ILogger<Balanc
         var balance =
             await _balanceRepository.GetBalanceOfAccount(accountId)
             ?? throw new AccountNotFoundException(accountId);
-        var balanceDifference = actionType is ActionType.Withdraw ? -amount : amount;
+        var balanceDifference = actionType is ActionType.Withdraw or ActionType.CardRefund
+            ? -amount
+            : amount;
         var balanceHistory = new BalanceHistory(
             accountId,
             balance.Value,
@@ -39,6 +44,7 @@ public class BalanceService(IBalanceRepository balanceRepository, ILogger<Balanc
         switch (actionType)
         {
             case ActionType.Withdraw:
+            case ActionType.CardRefund:
                 balance.Withdraw(amount);
                 break;
             case ActionType.Deposit:

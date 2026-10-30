@@ -6,6 +6,7 @@ public enum ActionType
     Buy,
     Deposit,
     Withdraw,
+    CardRefund,
     PackageFee,
     TransactionFee,
     CollectFee,

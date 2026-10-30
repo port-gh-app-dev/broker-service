@@ -43,6 +43,21 @@ public class BalanceController(IBalanceService balanceService) : ControllerBase
     }
 
     /// <summary>
+    /// Refund money from the account balance back to a credit card
+    /// </summary>
+    /// <param name="accountId">Account ID</param>
+    /// <param name="cardRefundDTO">Refund information</param>
+    /// <returns>Updated balance value</returns>
+    [ProducesResponseType(typeof(Balance), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [HttpPost("{accountId:int}/refund")]
+    public async Task<Balance> RefundToCard(int accountId, CardRefundDTO cardRefundDTO)
+    {
+        return await _balanceService.Refund(accountId, cardRefundDTO.Amount);
+    }
+
+    /// <summary>
     /// Get current balance of an account
     /// </summary>
     /// <param name="accountId">Account ID</param>

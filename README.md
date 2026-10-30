@@ -43,7 +43,7 @@ When enabled every request will be delayed by **HIGH_CPU_USAGE_REQUEST_DELAY_MS*
 
 #### Credit card validation
 
-When enabled, the `cardNumber` field from deposit and withdraw request bodies is validated against the mainframe before the operation is processed. If the mainframe deems the card invalid, the request is rejected with a `400` response.
+When enabled, the `cardNumber` field from deposit, withdraw, and refund request bodies is validated against the mainframe before the operation is processed. If the mainframe deems the card invalid, the request is rejected with a `400` response.
 
 If the mainframe is unreachable, returns an error, or `MAINFRAME_SERVICE_URL` is not configured, the middleware fails open and the request proceeds normally. This means `MAINFRAME_SERVICE_URL` is only required when the flag is enabled.
 
@@ -161,6 +161,63 @@ curl -X 'POST' \
   "email": "Email",
   "cardNumber": "Card Number",
   "cardType": "Card Type"
+}'
+```
+
+---
+
+#### `POST` **/v1/balance/{accountId}/refund** `Refund money from account balance back to a card`
+
+##### Parameters
+
+| name         | type     | data type | description | source    |
+| ------------ | -------- | --------- | ----------- | --------- |
+| `accountId`  | required | int       | Account ID  | Path      |
+| `amount`     | required | decimal   | Amount      | Body JSON |
+| `name`       | required | string    | Name        | Body JSON |
+| `address`    | required | string    | Address     | Body JSON |
+| `email`      | required | string    | Email       | Body JSON |
+| `cardNumber` | required | string    | Card number | Body JSON |
+| `cardType`   | required | string    | Card type   | Body JSON |
+| `cvv`        | required | string    | CVV         | Body JSON |
+
+##### Responses
+
+| http code | content-type       | response                                                        |
+| --------- | ------------------ | --------------------------------------------------------------- |
+| `200`     | `application/json` | `{"accountId": 1, "value": 23.6}`                               |
+| `400`     | `application/json` | `{"code":"400","message":"Amount can't be lower that 0"}`       |
+| `404`     | `application/json` | `{"code":"404","message":"Account with id {id} doesn't exist"}` |
+
+##### Example of request JSON body
+
+```json
+{
+  "amount": 10,
+  "name": "Name",
+  "address": "Address",
+  "email": "Email",
+  "cardNumber": "Card Number",
+  "cardType": "Card Type",
+  "cvv": "123"
+}
+```
+
+##### Example cURL
+
+```bash
+curl -X 'POST' \
+'http://localhost/broker-service/v1/balance/1/refund' \
+-H 'accept: text/plain' \
+-H 'Content-Type: application/json' \
+-d '{
+  "amount": 10,
+  "name": "Name",
+  "address": "Address",
+  "email": "Email",
+  "cardNumber": "Card Number",
+  "cardType": "Card Type",
+  "cvv": "123"
 }'
 ```
 
