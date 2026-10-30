@@ -1,0 +1,162 @@
+project:
+  name: "BrokerService"
+  description: "ASP.NET Core (.NET 8) service of the EasyTrade application that manages account balances and processes quick and long-running trades."
+  repo_base_url: "https://github.com/port-gh-app-dev/broker-service/blob"
+  ref_commit_hash: "0e7f657163c06ac393c664199a474abcd896422c"
+  updated_at: "2026-10-30"
+
+pages:
+  - id: broker-service_01_overview
+    title: "Overview and Architecture"
+    filename: "01_overview.md"
+    description: "Purpose, technology stack, startup pipeline and dependency wiring"
+    source_files:
+      - "README.md"
+      - "BrokerService/src/Program.cs"
+      - "BrokerService/src/BrokerService.csproj"
+      - "BrokerService/src/Helpers/BrokerServiceDependencyExtension.cs"
+    sections:
+      - id: broker-service_01_overview_introduction
+        title: "Introduction"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: broker-service_01_overview_startup
+        title: "Startup and Request Pipeline"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["flowchart"]
+      - id: broker-service_01_overview_di
+        title: "Dependency Injection Groups"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages:
+      - broker-service_02_api-reference
+      - broker-service_05_configuration-deployment
+
+  - id: broker-service_02_api-reference
+    title: "REST API Reference"
+    filename: "02_api-reference.md"
+    description: "Balance, instrument, trade and version endpoints"
+    source_files:
+      - "BrokerService/src/Entities/Balances/Controllers/BalanceController.cs"
+      - "BrokerService/src/Entities/Trades/Controllers/TradeController.cs"
+      - "BrokerService/src/Entities/Instruments/Controllers/InstrumentController.cs"
+      - "BrokerService/src/Versioning/VersionController.cs"
+      - "BrokerService/src/ExceptionHandling/BrokerExceptionFilter.cs"
+    sections:
+      - id: broker-service_02_api-reference_endpoints
+        title: "Endpoints"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: broker-service_02_api-reference_errors
+        title: "Error Handling"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages:
+      - broker-service_03_trading-balances
+
+  - id: broker-service_03_trading-balances
+    title: "Trading and Balance Logic"
+    filename: "03_trading-balances.md"
+    description: "Balance changes, quick trades, long trades and fee collection"
+    source_files:
+      - "BrokerService/src/Entities/Balances/Service/BalanceService.cs"
+      - "BrokerService/src/Entities/Balances/Balance.cs"
+      - "BrokerService/src/Entities/Trades/Service/TradeServiceBase.cs"
+      - "BrokerService/src/Entities/Trades/Service/TradeService.cs"
+      - "BrokerService/src/Entities/Trades/Service/LongTradeService.cs"
+      - "BrokerService/src/Entities/Trades/Trade.cs"
+    sections:
+      - id: broker-service_03_trading-balances_balance
+        title: "Deposits and Withdrawals"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: broker-service_03_trading-balances_quick
+        title: "Quick Buy and Sell"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["sequence"]
+      - id: broker-service_03_trading-balances_long
+        title: "Long-Running Trades"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["flowchart"]
+    related_pages:
+      - broker-service_04_data-integrations
+
+  - id: broker-service_04_data-integrations
+    title: "Data Model and External Services"
+    filename: "04_data-integrations.md"
+    description: "EF Core context, entities and HTTP connectors to other EasyTrade services"
+    source_files:
+      - "BrokerService/src/BrokerDbContext.cs"
+      - "BrokerService/src/Entities/Instruments/OwnedInstrument.cs"
+      - "BrokerService/src/Helpers/TransactionalRepository.cs"
+      - "BrokerService/src/Helpers/ActionType.cs"
+      - "BrokerService/src/Entities/Prices/ServiceConnector/PriceServiceConnector.cs"
+      - "BrokerService/src/Entities/Accounts/ServiceConnector/AccountServiceConnector.cs"
+      - "BrokerService/src/Entities/Trades/Notification/TradeNotificationService.cs"
+    sections:
+      - id: broker-service_04_data-integrations_db
+        title: "Database Model"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: broker-service_04_data-integrations_connectors
+        title: "Service Connectors"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages:
+      - broker-service_03_trading-balances
+
+  - id: broker-service_05_configuration-deployment
+    title: "Configuration, Build and Deployment"
+    filename: "05_configuration-deployment.md"
+    description: "Environment variables, Docker build, tests and CI"
+    source_files:
+      - "BrokerService/src/Helpers/Constants.cs"
+      - "BrokerService/src/appsettings.json"
+      - "Dockerfile"
+      - "BrokerService/test/BrokerService.test.csproj"
+      - ".github/workflows/ci_workflow_1_gdzn.yml"
+      - ".github/workflows/ci_workflow_2_1hth.yml"
+    sections:
+      - id: broker-service_05_configuration-deployment_config
+        title: "Configuration"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+      - id: broker-service_05_configuration-deployment_build
+        title: "Docker Build, Tests and CI"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages:
+      - broker-service_01_overview
+
+  - id: broker-service_06_problem-patterns
+    title: "Problem Patterns and Feature Flags"
+    filename: "06_problem-patterns.md"
+    description: "OpenFeature-driven fault injection and credit card validation middleware"
+    source_files:
+      - "BrokerService/src/ProblemPatterns/**/*.cs"
+      - "BrokerService/src/Middleware/CreditCardValidation/*.cs"
+    sections:
+      - id: broker-service_06_problem-patterns_flags
+        title: "Feature Flag Plumbing"
+        autogen: true
+        diagrams_needed: true
+        diagram_types: ["class"]
+      - id: broker-service_06_problem-patterns_patterns
+        title: "Patterns"
+        autogen: true
+        diagrams_needed: false
+        diagram_types: []
+    related_pages:
+      - broker-service_05_configuration-deployment
